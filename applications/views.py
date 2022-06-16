@@ -13,7 +13,7 @@ from rest_framework import generics
 
 # Apiview to handle cration of application by students and staff/sponsors can  retrieve/search list of applications
 
-class applicationsList(generics.ListCreateAPIView):
+class applicationsView(generics.ListCreateAPIView):
 
     authentication_classes= [TokenAuthentication]
     # permission_classes=[IsAuthenticated]
