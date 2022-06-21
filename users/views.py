@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 
 class UserCreation(APIView):
 
-    authentication_classes=[TokenAuthentication]
+    # authentication_classes=[TokenAuthentication]
     # permission_classes=[IsAuthenticated]
 
     def get(self, request, format=None):
