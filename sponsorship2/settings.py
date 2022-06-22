@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'django_filters',
     
+    
 
 ]
 
@@ -165,3 +166,14 @@ EMAIL_USE_SSL=False
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
+
+PASSWORD_HASHERS = (
+    
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+    'django.contrib.auth.hashers.BCryptPasswordHasher',
+    'django.contrib.auth.hashers.SHA1PasswordHasher',
+    'django.contrib.auth.hashers.MD5PasswordHasher',
+    'django.contrib.auth.hashers.CryptPasswordHasher',
+)

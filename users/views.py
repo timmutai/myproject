@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth.hashers import make_password
 
 class UserCreation(APIView):
 
@@ -21,6 +22,10 @@ class UserCreation(APIView):
         serializer=UserCreationSerializer(data=request.data)
 
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
+            password=make_password(self.request.data.get('password'))
+            
+            
+            serializer.save(password=password)
+            
+            return Response(request.data)
         return Response(serializer.errors)
