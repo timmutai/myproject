@@ -1,1 +1,6 @@
-pycache/
+applications/__pycache__/
+users/__pycache__/
+gallery/__pycache__/
+applications/migrations/__pycache__/
+gallery/migrations/__pycache__/
+users/migrations/__pycache__/
