@@ -3,10 +3,7 @@ from . import views
 
 urlpatterns = [
     
-    path('photos', views.photos.as_view(), name='photos'),
-    
-    
-    
-    
+    path('albumView', views.albumView.as_view(), name='albumView'),
+    path('galleyView', views.galleyView.as_view(), name='galleyView'),      
     
 ]
