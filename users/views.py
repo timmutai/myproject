@@ -27,5 +27,5 @@ class UserCreation(APIView):
             
             serializer.save(password=password)
             
-            return Response(request.data)
+            return Response(serializer.data)
         return Response(serializer.errors)
