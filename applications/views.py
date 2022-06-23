@@ -89,7 +89,7 @@ class applicationApproval(generics.RetrieveUpdateAPIView):
                     fail_silently=False,
     
                 )    
-                return Response(response)
+                
             except:
                 return Response('An error occured while sending email, please try again')    
                         
@@ -108,7 +108,7 @@ class applicationApproval(generics.RetrieveUpdateAPIView):
                         fail_silently=False,
     
                 )    
-                return Response(response)
+                
             except:
                 return Response('An error occured while sending email, please try again')
         return (response)
