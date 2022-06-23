@@ -18,11 +18,11 @@ class photos(generics.ListCreateAPIView):
     serializer_class=GallerySerializer
 
     def list(self, request, *args, **kwargs):
-        # if request.user.is_student:
-        return super().list(request, *args, **kwargs)
+        if request.user.is_student:
+            return super().list(request, *args, **kwargs)
 
-        # else:
-        #     return Response('Access Denied: only students can view this page')
+        else:
+            return Response('Access Denied: only students can view this page')
 
     def create(self, request, *args, **kwargs):
         if request.user.is_student:
