@@ -3,12 +3,13 @@ from rest_framework.views import APIView
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
-from .serializers import applicationSerializer
+from .serializers import applicationSerializer,applicationApprovalSerializer
 from rest_framework.filters  import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import applications
 from django.core.mail import send_mail
 from rest_framework import generics
+from django.http import Http404
 
 from applications import serializers
 
@@ -18,7 +19,7 @@ from applications import serializers
 class applicationView(generics.ListCreateAPIView):
 
     authentication_classes= [TokenAuthentication]
-    permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated]          
     
     queryset=applications.objects.all()
     serializer_class=applicationSerializer
@@ -30,20 +31,38 @@ class applicationView(generics.ListCreateAPIView):
     
     def create(self, request, *args, **kwargs):
         if request.user.is_student:
-            return super().create(request, *args, **kwargs)
+            
+            serializer = self.get_serializer(data=request.data)
+            user=self.request.user
+
+            if serializer.is_valid():
+                
+                serializer.save(user=user)
+                return Response(serializer.data)
+            return Response(serializer.errors)
         else:
-            return Response('You dont have permission to create an application')
+            return Response({'response':'You dont have permission to create an application, only students can create applications'})
     
     def list(self, request, *args, **kwargs):
+        
         if request.user.is_sponsor:
             approved=self.get_queryset().filter(staffapproval=True)
-            serailazer=applicationSerializer(approved, many=True)
-            return Response(data=serailazer.data)
+            serailazer=self.get_serializer(approved, many=True)
+            
+            if approved:
+                return Response(data=serailazer.data)
+            else:
+                return Response({'response':'No approved applications to display'}) 
 
         elif request.user.is_staff:
-            return super().list(request, *args, **kwargs)        
+            response= self.get_queryset()
+            serailazer=self.get_serializer(response, many=True)
+            if response:
+                return Response(serailazer.data)    
+            else:
+                return Response({'response':'No applications to display'})    
         else:
-            return Response('You dont have permission to view list of applications')
+            return Response({'response':'You dont have permission to view list of applications'})
     
 
 class applicationApproval(generics.RetrieveUpdateAPIView):
@@ -53,62 +72,92 @@ class applicationApproval(generics.RetrieveUpdateAPIView):
 
     queryset=applications.objects.filter()
     serializer_class=applicationSerializer 
+    lookup_field = 'pk'
             
     def retrieve(self, request, pk,*args, **kwargs):
         
         
         if request.user.is_staff:
                
-            return super().retrieve(request, *args, **kwargs)
+            application=self.get_queryset().filter(id=pk)
+            if application:
+                serailazer=self.get_serializer(application,many=True)
+                return Response(serailazer.data)
+            else:
+                return Response ({'response': 'No records to display'})
             
         if request.user.is_sponsor:
             approved=self.get_queryset().filter(staffapproval=True,id=pk)
-            serailazer=applicationSerializer(approved, many=True)
-            
-            return Response(data=serailazer.data)
+
+            if approved:
+                serailazer=self.get_serializer(approved, many=True)            
+                return Response(data=serailazer.data)
+            else:
+                return Response ({'response': 'No records to display'})
            
 
         else:
-            return Response('Access Denied: you dont have permission to view this resource')
+            return Response({'response':'Access Denied: you dont have permission to view this resource'})
 
     
-    def update(self, request, pk, *args, **kwargs):
+    def update(self, request,  *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        
+        if serializer.is_valid():
 
-        response= super().update(request, *args, **kwargs)
-        emails=applications.objects.filter().first()
-        mail=emails.idno.email
-        if self.request.user.is_staff and response.status_code==200:                      
-    
-            try:
+            if self.request.user.is_student:
+                return Response({'response':'Access Denied: your dont have permission to view this page'})
+
+            if self.request.user.is_staff:
                 
-                send_mail(
-                    'Spornsorship', # subject
-                    'Your application for sponsorship has been approved by a staff, Kindly wait for sponsorship',  # message
-                    '', # sender
-                    [mail], #receiver
-                    fail_silently=False,
+                serializer.save()
+
+                emails=applications.objects.filter().first()
+                mail=emails.user.email                            
     
-                )    
+                try:
                 
-            except:
-                return Response('An error occured while sending email, please try again')    
-                        
-                          
-        elif self.request.user.is_sponsor:
-           
-    
-            try:
-                emessage='Your application for sponsorship has been approved by a sponsor,Below are the sponsor details :'
-                send_mail(
+                    send_mail(
                         'Spornsorship', # subject
-                        # message
-                        f'{emessage},Name :{request.user.firstName},Email :{request.user.email},Phone :{request.user.phone_No},Country :{request.user.country}',
+                        'Your application for sponsorship has been approved by a staff, Kindly wait for sponsorship',  # message
                         '', # sender
                         [mail], #receiver
                         fail_silently=False,
     
-                )    
+                    )    
                 
-            except:
-                return Response('An error occured while sending email, please try again')
-        return (response)
+                except:
+                    return Response({'response':'An error occured while sending email, please try again'})    
+                return Response(request.data)            
+                          
+            if self.request.user.is_sponsor and instance.staffapproval:
+                serializer.save()
+
+                emails=applications.objects.filter().first()
+                mail=emails.user.email 
+           
+                if serializer.save():
+                    try:
+                        emessage='Your application for sponsorship has been approved by a sponsor,Below are the sponsor details :'
+                        send_mail(
+                                'Spornsorship', # subject
+                                # message
+                                f'{emessage},Name :{request.user.firstName},Email :{request.user.email},Phone :{request.user.phone_No},Country :{request.user.country}',
+                                '', # sender
+                                [mail], #receiver
+                                fail_silently=False,
+        
+                        )    
+                    
+                    except:
+                        return Response({'response':'An error occured while sending email, please try again'})
+                return Response(request.data)
+
+            else:
+                return Response({'response':'The application have not been approved by the staff'})
+
+        
+
+
+        return Response(serializer.errors)

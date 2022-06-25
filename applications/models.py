@@ -5,7 +5,7 @@ from django.db import models
 # Model to store student application status
 class applications(models.Model):
     
-    idno=models.ForeignKey(users,on_delete=models.PROTECT)    
+    user=models.ForeignKey(users,on_delete=models.PROTECT)    
     school_name=models.CharField(max_length=200 )
     school_address=models.CharField(max_length=200 )
     academic_level=models.CharField(max_length=100 )
@@ -17,7 +17,7 @@ class applications(models.Model):
     sponsor=models.TextField(max_length=200, null=True)
     applicationDate=models.DateField(auto_now_add=True)
     staffapproval=models.BooleanField(default=False)
-    sponsorshipStatus=models.BooleanField(default=False)
+    sponsorshipApproval=models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.idno)

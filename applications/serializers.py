@@ -8,7 +8,7 @@ class applicationSerializer(serializers.ModelSerializer):
     
     class Meta:
         model=applications
-        fields='__all__'
+        exclude=['user']
 
 
 class studentSchoolSerializer(serializers.ModelSerializer):
@@ -19,3 +19,11 @@ class studentSchoolSerializer(serializers.ModelSerializer):
     class Meta:
         model=applications
         exclude=['sponsor','applicationDate','staffapproval','sponsorshipStatus']
+
+
+class applicationApprovalSerializer(serializers.ModelSerializer):
+
+    
+    class Meta:
+        model=applications
+        fields=['staffapproval']

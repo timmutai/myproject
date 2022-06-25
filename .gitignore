@@ -4,3 +4,4 @@ gallery/__pycache__/
 applications/migrations/__pycache__/
 gallery/migrations/__pycache__/
 users/migrations/__pycache__/
+.requiremnents2.txt
