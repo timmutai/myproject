@@ -8,15 +8,15 @@ class applicationSerializer(serializers.ModelSerializer):
     
     class Meta:
         model=applications
-        exclude=['user','sponsorshipApproval','sponsor']
+        exclude=['user']
 
 
 
 
 
-class applicationApprovalSerializer(serializers.ModelSerializer):
+# class applicationApprovalSerializer(serializers.ModelSerializer):
 
     
-    class Meta:
-        model=applications
-        fields=['staffapproval']
+#     class Meta:
+#         model=applications
+#         fields=['staffapproval','sponsorshipApproval']

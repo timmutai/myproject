@@ -6,13 +6,13 @@ class albumSerializer(serializers.ModelSerializer):
     
     class Meta:
         model= album
-        fields='__all__'
+        exclude=['user']
 
 class GallerySerializer(serializers.ModelSerializer):       
     
     class Meta:
         model= Gallery
-        fields='__all__'
+        exclude=['user']
 
 
         
