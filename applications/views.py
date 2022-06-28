@@ -79,7 +79,7 @@ class applicationApproval(generics.RetrieveUpdateAPIView):
         
         if request.user.is_staff:
                
-            application=self.get_queryset().filter(id=pk)
+            application=self.get_queryset().filter(pk=pk)
             if application:
                 serailazer=self.get_serializer(application,many=True)
                 return Response(serailazer.data)
@@ -93,7 +93,7 @@ class applicationApproval(generics.RetrieveUpdateAPIView):
                 serailazer=self.get_serializer(approved, many=True)            
                 return Response(data=serailazer.data)
             else:
-                return Response ({'response': 'No records to display'})
+                return Response ({'response': 'This application have not been approved by the staff'})
            
 
         else:
