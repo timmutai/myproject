@@ -6,7 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics
 from .pagination import ListViewPagination
 from yaml import serialize
-from .serializers import applicationSerializer
+from .serializers import applicationSerializer, applicationApprovalSerializer
 from .models import applications
 from django.core.mail import send_mail
 
@@ -73,7 +73,7 @@ class applicationApproval(generics.RetrieveUpdateAPIView):
     permission_classes=[IsAuthenticated]
 
     queryset=applications.objects.filter()
-    serializer_class=applicationSerializer 
+    serializer_class=applicationApprovalSerializer 
     lookup_field = 'pk'
             
     def retrieve(self, request, pk,*args, **kwargs):

@@ -14,9 +14,9 @@ class applicationSerializer(serializers.ModelSerializer):
 
 
 
-# class applicationApprovalSerializer(serializers.ModelSerializer):
+class applicationApprovalSerializer(serializers.ModelSerializer):
 
     
-#     class Meta:
-#         model=applications
-#         fields=['staffapproval','sponsorshipApproval']
+    class Meta:
+        model=applications
+        fields=['staffapproval','sponsorshipApproval']
