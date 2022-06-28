@@ -8,7 +8,7 @@ class applicationSerializer(serializers.ModelSerializer):
     
     class Meta:
         model=applications
-        exclude=['user','staffapproval','sponsorshipApproval','sponsor']
+        exclude=['user','sponsorshipApproval','sponsor']
 
 
 

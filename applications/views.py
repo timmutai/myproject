@@ -1,29 +1,26 @@
-from urllib import response
-from rest_framework.views import APIView
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .serializers import applicationSerializer,applicationApprovalSerializer
 from rest_framework.filters  import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.pagination import PageNumberPagination
+from rest_framework import generics
+from yaml import serialize
+from .serializers import applicationSerializer
 from .models import applications
 from django.core.mail import send_mail
-from rest_framework import generics
-from django.http import Http404
-
-from applications import serializers
 
 
 # Apiview to handle cration of application by students and staff/sponsors can  retrieve/search list of applications
 
 class applicationView(generics.ListCreateAPIView):
-
-    authentication_classes= [TokenAuthentication]
-    permission_classes=[IsAuthenticated]          
-    
+                 
     queryset=applications.objects.all()
     serializer_class=applicationSerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter]
+    authentication_classes= [TokenAuthentication,]
+    permission_classes=[IsAuthenticated,] 
+    pagination_class=PageNumberPagination
+    filter_backends = [DjangoFilterBackend, SearchFilter,]
     filterset_fields = ['id', 'school_name']
     search_fields = ['school_name']
 
@@ -43,10 +40,11 @@ class applicationView(generics.ListCreateAPIView):
         else:
             return Response({'response':'You dont have permission to create an application, only students can create applications'})
     
+   
     def list(self, request, *args, **kwargs):
         
         if request.user.is_sponsor:
-            approved=self.get_queryset().filter(staffapproval=True)
+            approved=self.filter_queryset(self.get_queryset().filter(staffapproval=True))
             serailazer=self.get_serializer(approved, many=True)
             
             if approved:
@@ -55,7 +53,7 @@ class applicationView(generics.ListCreateAPIView):
                 return Response({'response':'No approved applications to display'}) 
 
         elif request.user.is_staff:
-            response= self.get_queryset()
+            response= self.filter_queryset(self.get_queryset())
             serailazer=self.get_serializer(response, many=True)
             if response:
                 return Response(serailazer.data)    
@@ -63,7 +61,6 @@ class applicationView(generics.ListCreateAPIView):
                 return Response({'response':'No applications to display'})    
         else:
             return Response({'response':'You dont have permission to view list of applications'})
-    
 
 class applicationApproval(generics.RetrieveUpdateAPIView):
 

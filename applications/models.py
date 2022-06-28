@@ -20,4 +20,4 @@ class applications(models.Model):
     sponsorshipApproval=models.BooleanField(default=False)
 
     def __str__(self):
-        return str(self.idno)
+        return str(self.user)
