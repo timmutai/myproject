@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'gallery',
     'phonenumber_field',
     'django_filters',
+    'drf_yasg',
     
     
 
